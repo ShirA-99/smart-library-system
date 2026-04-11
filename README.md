@@ -1,24 +1,26 @@
-# 📚 Smart Library Self-Service System
+# Smart Library Self-Service System
 
 A concurrency-safe university library self-service system built with
-Python, PostgreSQL, and Streamlit. Designed to handle multiple kiosk
+Python, PostgreSQL, and Flask. Designed to handle multiple kiosk
 users simultaneously during peak hours (e.g., exam periods).
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | Streamlit |
-| Backend | Python 3.8+ |
+| Frontend | HTML, CSS, Jinja2 Templates |
+| Backend | Flask (Python 3.8+) |
 | Database | PostgreSQL |
+| Icons | Phosphor Icons |
+| Fonts | DM Sans (Google Fonts) |
 | Concurrency Control | PostgreSQL Row-Level Locking (`SELECT FOR UPDATE`) |
 | Version Control | Git + GitHub |
 
 ---
 
-## ⚙️ Prerequisites
+## Prerequisites
 
 Make sure you have the following installed:
 
@@ -29,7 +31,7 @@ Make sure you have the following installed:
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Clone the Repository
 
@@ -37,8 +39,6 @@ Make sure you have the following installed:
 git clone https://github.com/ShirA-99/smart-library-system.git
 cd smart-library-system
 ```
-
-> ⚠️ Replace `YOUR_USERNAME` with the actual GitHub username.
 
 ---
 
@@ -83,7 +83,7 @@ Verify it works:
 psql --version
 ```
 
-> 💡 To make this permanent, add `C:\Program Files\PostgreSQL\16\bin`
+> Tip: To make this permanent, add `C:\Program Files\PostgreSQL\16\bin`
 > to your System Environment Variables under **Path**.
 
 ---
@@ -126,7 +126,7 @@ DB_USER=postgres
 DB_PASSWORD=your_password_here
 ```
 
-> ⚠️ Replace `your_password_here` with your actual PostgreSQL password.
+> Note: Replace `your_password_here` with your actual PostgreSQL password.
 > The `.env` file is already in `.gitignore` — it will NOT be uploaded to GitHub.
 
 ---
@@ -134,22 +134,22 @@ DB_PASSWORD=your_password_here
 ### 7. Run the Application
 
 ```bash
-streamlit run app.py
+python app.py
 ```
 
 Then open your browser and go to:
 ```
-http://localhost:8501
+http://localhost:5000
 ```
 
 ---
 
-## 🖥️ Simulating Multiple Kiosks
+## Simulating Multiple Kiosks
 
 Each browser tab acts as a **separate kiosk**.
 
 To demonstrate concurrency:
-1. Open `http://localhost:8501` in **two or more browser tabs**
+1. Open `http://localhost:5000` in **two or more browser tabs**
 2. Log in as different students in each tab
 3. Try borrowing the **same book** from both tabs at the same time
 4. Only **one tab will succeed** — the other will be blocked
@@ -158,7 +158,7 @@ This demonstrates the **race condition prevention** built into the system.
 
 ---
 
-## 🧪 Running the Load Test
+## Running the Load Test
 
 To simulate many kiosks operating at the same time:
 
@@ -174,35 +174,44 @@ This script will:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 smart-library-system/
-│
-├── README.md                  # This file
-├── requirements.txt           # Python dependencies
-├── .env                       # DB credentials (not on GitHub)
-├── .gitignore                 # Files excluded from GitHub
-│
-├── database/
-│   ├── schema.sql             # Table definitions and indexes
-│   └── seed_data.sql          # Sample books and students
-│
-├── src/
-│   ├── db.py                  # Database connection manager
-│   ├── borrow.py              # Borrow logic with locking
-│   ├── return_book.py         # Return logic
-│   └── renew.py               # Renew logic
-│
-├── app.py                     # Streamlit UI (main entry point)
-│
-└── tests/
-    └── load_test.py           # Concurrent kiosk load test
+|
+|-- README.md                  # This file
+|-- requirements.txt           # Python dependencies
+|-- .env                       # DB credentials (not on GitHub)
+|-- .gitignore                 # Files excluded from GitHub
+|
+|-- app.py                     # Flask app (main entry point)
+|
+|-- templates/
+|   |-- base.html              # Base layout template
+|   |-- navbar.html            # Shared navigation bar
+|   |-- login.html             # Student login page
+|   |-- dashboard.html         # Browse & borrow books
+|   |-- returns.html           # Return borrowed books
+|   |-- renew.html             # Renew borrowed books
+|   |-- history.html           # Borrowing history
+|
+|-- database/
+|   |-- schema.sql             # Table definitions and indexes
+|   |-- seed_data.sql          # Sample books and students
+|
+|-- src/
+|   |-- db.py                  # Database connection manager
+|   |-- borrow.py              # Borrow logic with locking
+|   |-- return_book.py         # Return logic
+|   |-- renew.py               # Renew logic
+|
+|-- tests/
+    |-- load_test.py           # Concurrent kiosk load test
 ```
 
 ---
 
-## 🔐 How Concurrency Control Works
+## How Concurrency Control Works
 
 This system prevents race conditions using two strategies:
 
@@ -221,7 +230,7 @@ This system prevents race conditions using two strategies:
 
 ---
 
-## 🗄️ Database Tables
+## Database Tables
 
 | Table | Description |
 |---|---|
@@ -232,7 +241,7 @@ This system prevents race conditions using two strategies:
 
 ---
 
-## 👥 Authors
+## Authors
 
 | Name | Student ID |
 |---|---|
@@ -241,6 +250,6 @@ This system prevents race conditions using two strategies:
 
 ---
 
-## 📄 License
+## License
 
 This project is developed for academic purposes only.

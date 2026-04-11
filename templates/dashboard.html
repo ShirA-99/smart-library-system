@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Browse Books — University Library{% endblock %}
+
+{% block navbar %}
+{% include "navbar.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="ph-bold ph-book-open-text"></i> Browse & Borrow</h1>
+    <p>Search the catalog and borrow books directly from any kiosk.</p>
+</div>
+
+<!-- Search -->
+<form method="GET" action="{{ url_for('dashboard') }}" class="search-bar">
+    <i class="ph ph-magnifying-glass"></i>
+    <input type="text" name="q" value="{{ search_query }}" placeholder="Search by title, author, or category...">
+    <button type="submit">Search</button>
+</form>
+
+{% if books %}
+<div class="result-info">
+    Showing <strong>{{ books|length }}</strong> book(s)
+    {% if search_query %} for "<strong>{{ search_query }}</strong>"{% endif %}
+</div>
+
+<div class="stagger">
+{% for book in books %}
+    <div class="book-card animate-fade-in-up">
+        <div class="book-icon">
+            <i class="ph-duotone ph-book-bookmark"></i>
+        </div>
+        <div class="book-info">
+            <div class="book-title">{{ book.title }}</div>
+            <div class="book-meta">
+                <span><i class="ph ph-user"></i> {{ book.author }}</span>
+                <span><i class="ph ph-tag"></i> {{ book.category }}</span>
+                <span><i class="ph ph-barcode"></i> {{ book.isbn }}</span>
+            </div>
+        </div>
+        <div class="book-actions">
+            {% set available = book.available_copies|int %}
+            {% set total = book.total_copies|int %}
+
+            {% if available > 0 %}
+                <div class="badge badge-available">
+                    <i class="ph-bold ph-check-circle"></i>
+                    {{ available }}/{{ total }} Available
+                </div>
+                <form method="POST" action="{{ url_for('borrow', book_id=book.book_id) }}" style="margin:0;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ph-bold ph-arrow-circle-down"></i>
+                        Borrow
+                    </button>
+                </form>
+            {% else %}
+                <div class="badge badge-unavailable">
+                    <i class="ph-bold ph-x-circle"></i>
+                    0/{{ total }} Available
+                </div>
+                <button class="btn btn-disabled" disabled>Not Available</button>
+            {% endif %}
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+{% else %}
+<div class="empty-state">
+    <i class="ph-duotone ph-magnifying-glass"></i>
+    <h3>No books found</h3>
+    <p>Try adjusting your search query or browse the full catalog.</p>
+</div>
+{% endif %}
+{% endblock %}

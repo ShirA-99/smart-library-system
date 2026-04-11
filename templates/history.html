@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Borrowing History — University Library{% endblock %}
+
+{% block navbar %}
+{% include "navbar.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="ph-bold ph-clock-counter-clockwise"></i> Borrowing History</h1>
+    <p>View all your past and current borrowing records.</p>
+</div>
+
+{% if records %}
+<div class="result-info">
+    Total records: <strong>{{ records|length }}</strong>
+</div>
+
+<div class="stagger">
+{% for record in records %}
+    <div class="book-card animate-fade-in-up">
+        <div class="book-icon">
+            <i class="ph-duotone ph-book-bookmark"></i>
+        </div>
+        <div class="book-info">
+            <div class="book-title">{{ record.title }}</div>
+            <div class="book-meta">
+                <span><i class="ph ph-user"></i> {{ record.author }}</span>
+                <span><i class="ph ph-copy"></i> Copy {{ record.copy_number }}</span>
+                <span><i class="ph ph-calendar-blank"></i> Borrowed: {{ record.borrowed_at.strftime('%d %b %Y') }}</span>
+                <span><i class="ph ph-arrows-clockwise"></i> Renewed: {{ record.renewed_count }}x</span>
+            </div>
+        </div>
+        <div class="book-actions">
+            {% if record.status == 'active' %}
+                <div class="badge badge-active">
+                    <i class="ph-bold ph-circle-dashed"></i>
+                    Active
+                </div>
+            {% elif record.status == 'returned' %}
+                <div style="text-align: right;">
+                    <div class="badge badge-returned">
+                        <i class="ph-bold ph-check-circle"></i>
+                        Returned
+                    </div>
+                    {% if record.returned_at %}
+                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">
+                        on {{ record.returned_at.strftime('%d %b %Y') }}
+                    </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="badge badge-overdue">
+                    <i class="ph-bold ph-warning"></i>
+                    Overdue
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+{% else %}
+<div class="empty-state">
+    <i class="ph-duotone ph-folder-open"></i>
+    <h3>No history yet</h3>
+    <p>Your borrowing history will appear here once you borrow a book.</p>
+</div>
+{% endif %}
+{% endblock %}

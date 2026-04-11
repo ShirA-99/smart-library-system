@@ -1,0 +1,35 @@
+<!-- Shared navbar for authenticated pages -->
+<nav class="navbar">
+    <a href="{{ url_for('dashboard') }}" class="navbar-brand">
+        <i class="ph-bold ph-books"></i>
+        University Library
+    </a>
+
+    <ul class="navbar-links">
+        <a href="{{ url_for('dashboard') }}" class="{{ 'active' if active_tab == 'browse' else '' }}">
+            <i class="ph ph-book-open-text"></i>
+            <span>Browse</span>
+        </a>
+        <a href="{{ url_for('returns') }}" class="{{ 'active' if active_tab == 'returns' else '' }}">
+            <i class="ph ph-arrow-u-up-left"></i>
+            <span>Return</span>
+        </a>
+        <a href="{{ url_for('renew_page') }}" class="{{ 'active' if active_tab == 'renew' else '' }}">
+            <i class="ph ph-arrows-clockwise"></i>
+            <span>Renew</span>
+        </a>
+        <a href="{{ url_for('history') }}" class="{{ 'active' if active_tab == 'history' else '' }}">
+            <i class="ph ph-clock-counter-clockwise"></i>
+            <span>History</span>
+        </a>
+    </ul>
+
+    <div class="navbar-user">
+        <i class="ph-fill ph-user-circle"></i>
+        <strong>{{ student.full_name }}</strong>
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="ph ph-sign-out"></i>
+            Sign Out
+        </a>
+    </div>
+</nav>

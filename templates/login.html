@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Sign In — University Library{% endblock %}
+
+{% block content %}
+<div style="display:flex; align-items:center; justify-content:center; min-height: calc(100vh - 180px);">
+    <div class="animate-scale-in" style="
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 48px 40px 40px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: var(--shadow-lg);
+    ">
+        <!-- Logo Area -->
+        <div style="text-align:center; margin-bottom: 32px;">
+            <div style="
+                width: 64px; height: 64px;
+                background: linear-gradient(135deg, var(--accent), #818cf8);
+                border-radius: var(--radius-lg);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 16px;
+                box-shadow: 0 8px 25px rgba(99,102,241,0.25);
+            ">
+                <i class="ph-bold ph-books" style="font-size: 32px; color: #fff;"></i>
+            </div>
+            <h1 style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
+                University Library
+            </h1>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                Sign in with your student number to get started.
+            </p>
+        </div>
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <div style="margin-bottom: 20px;">
+                <label style="
+                    display: block;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    margin-bottom: 6px;
+                ">Student Number</label>
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 0;
+                    border: 1px solid var(--border);
+                    border-radius: var(--radius-sm);
+                    overflow: hidden;
+                    transition: border-color 0.2s, box-shadow 0.2s;
+                " onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 3px rgba(99,102,241,0.1)';"
+                   onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
+                    <i class="ph ph-identification-badge" style="font-size: 20px; color: var(--text-muted); padding: 0 12px;"></i>
+                    <input
+                        type="text"
+                        name="student_number"
+                        placeholder="e.g. STU001"
+                        maxlength="20"
+                        required
+                        autofocus
+                        style="
+                            flex: 1;
+                            border: none;
+                            outline: none;
+                            padding: 13px 14px 13px 0;
+                            font-family: 'DM Sans', sans-serif;
+                            font-size: 0.95rem;
+                            color: var(--text-primary);
+                            background: transparent;
+                        "
+                    >
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="
+                width: 100%;
+                justify-content: center;
+                padding: 13px;
+                font-size: 0.95rem;
+                border-radius: var(--radius-sm);
+            ">
+                <i class="ph-bold ph-sign-in"></i>
+                Sign In
+            </button>
+        </form>
+
+        <div style="
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        ">
+            <i class="ph ph-info" style="font-size: 14px;"></i>
+            Test accounts: STU001 through STU010
+        </div>
+    </div>
+</div>
+{% endblock %}

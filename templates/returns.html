@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Return Books — University Library{% endblock %}
+
+{% block navbar %}
+{% include "navbar.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="ph-bold ph-arrow-u-up-left"></i> Return a Book</h1>
+    <p>Select a book from your active borrows to return it.</p>
+</div>
+
+{% if borrows %}
+<div class="result-info">
+    You have <strong>{{ borrows|length }}</strong> active borrow(s)
+</div>
+
+<div class="stagger">
+{% for borrow in borrows %}
+    <div class="book-card animate-fade-in-up">
+        <div class="book-icon">
+            <i class="ph-duotone ph-book-bookmark"></i>
+        </div>
+        <div class="book-info">
+            <div class="book-title">{{ borrow.title }}</div>
+            <div class="book-meta">
+                <span><i class="ph ph-user"></i> {{ borrow.author }}</span>
+                <span><i class="ph ph-copy"></i> Copy {{ borrow.copy_number }}</span>
+                <span><i class="ph ph-calendar-blank"></i> Borrowed: {{ borrow.borrowed_at.strftime('%d %b %Y') }}</span>
+            </div>
+        </div>
+        <div class="book-actions">
+            {% if borrow.due_status == 'Overdue' %}
+                <div>
+                    <div class="badge badge-overdue">
+                        <i class="ph-bold ph-warning"></i> OVERDUE
+                    </div>
+                    <div class="due-date" style="margin-top:4px; text-align:center; font-size:0.8rem; color:var(--danger);">{{ borrow.due_date.strftime('%d %b %Y') }}</div>
+                </div>
+            {% elif borrow.due_status == 'Due Soon' %}
+                <div>
+                    <div class="badge badge-due-soon">
+                        <i class="ph-bold ph-clock"></i> Due Soon
+                    </div>
+                    <div class="due-date" style="margin-top:4px; text-align:center; font-size:0.8rem; color:var(--warning);">{{ borrow.due_date.strftime('%d %b %Y') }}</div>
+                </div>
+            {% else %}
+                <div>
+                    <div class="badge badge-on-time">
+                        <i class="ph-bold ph-check-circle"></i> On Time
+                    </div>
+                    <div class="due-date" style="margin-top:4px; text-align:center; font-size:0.8rem; color:var(--success);">{{ borrow.due_date.strftime('%d %b %Y') }}</div>
+                </div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('return_action', record_id=borrow.record_id) }}" style="margin:0;">
+                <button type="submit" class="btn btn-primary">
+                    <i class="ph-bold ph-arrow-u-up-left"></i>
+                    Return
+                </button>
+            </form>
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+{% else %}
+<div class="empty-state">
+    <i class="ph-duotone ph-tray"></i>
+    <h3>Nothing to return</h3>
+    <p>You currently have no active borrows.</p>
+</div>
+{% endif %}
+{% endblock %}
