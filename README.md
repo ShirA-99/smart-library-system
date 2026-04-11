@@ -34,7 +34,7 @@ Make sure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/smart-library-system.git
+git clone https://github.com/ShirA-99/smart-library-system.git
 cd smart-library-system
 ```
 
