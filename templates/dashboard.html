@@ -7,7 +7,10 @@
 
 {% block content %}
 <div class="page-header">
-    <h1><i class="ph-bold ph-book-open-text"></i> Browse & Borrow</h1>
+    <h1>
+        <span class="header-icon"><i class="ph-bold ph-book-open-text"></i></span>
+        Browse &amp; Borrow
+    </h1>
     <p>Search the catalog and borrow books directly from any kiosk.</p>
 </div>
 
@@ -15,7 +18,10 @@
 <form method="GET" action="{{ url_for('dashboard') }}" class="search-bar">
     <i class="ph ph-magnifying-glass"></i>
     <input type="text" name="q" value="{{ search_query }}" placeholder="Search by title, author, or category...">
-    <button type="submit">Search</button>
+    <button type="submit">
+        <i class="ph-bold ph-magnifying-glass" style="font-size:15px; margin-right:4px;"></i>
+        Search
+    </button>
 </form>
 
 {% if books %}
@@ -48,7 +54,7 @@
                     {{ available }}/{{ total }} Available
                 </div>
                 <form method="POST" action="{{ url_for('borrow', book_id=book.book_id) }}" style="margin:0;">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-teal">
                         <i class="ph-bold ph-arrow-circle-down"></i>
                         Borrow
                     </button>
@@ -67,7 +73,9 @@
 
 {% else %}
 <div class="empty-state">
-    <i class="ph-duotone ph-magnifying-glass"></i>
+    <div class="empty-icon">
+        <i class="ph-duotone ph-magnifying-glass"></i>
+    </div>
     <h3>No books found</h3>
     <p>Try adjusting your search query or browse the full catalog.</p>
 </div>

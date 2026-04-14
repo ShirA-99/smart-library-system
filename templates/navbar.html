@@ -1,8 +1,13 @@
 <!-- Shared navbar for authenticated pages -->
 <nav class="navbar">
     <a href="{{ url_for('dashboard') }}" class="navbar-brand">
-        <i class="ph-bold ph-books"></i>
-        University Library
+        <div class="brand-icon">
+            <i class="ph-duotone ph-books"></i>
+        </div>
+        <div class="brand-text">
+            <span class="brand-name">University Library</span>
+            <span class="brand-sub">Self-Service Kiosk</span>
+        </div>
     </a>
 
     <ul class="navbar-links">
@@ -25,7 +30,9 @@
     </ul>
 
     <div class="navbar-user">
-        <i class="ph-fill ph-user-circle"></i>
+        <div class="user-avatar">
+            <i class="ph-fill ph-user-circle"></i>
+        </div>
         <strong>{{ student.full_name }}</strong>
         <a href="{{ url_for('logout') }}" class="btn-logout">
             <i class="ph ph-sign-out"></i>

@@ -7,7 +7,10 @@
 
 {% block content %}
 <div class="page-header">
-    <h1><i class="ph-bold ph-arrows-clockwise"></i> Renew a Book</h1>
+    <h1>
+        <span class="header-icon"><i class="ph-bold ph-arrows-clockwise"></i></span>
+        Renew a Book
+    </h1>
     <p>Extend your borrow period by 14 days. Maximum 2 renewals per book.</p>
 </div>
 
@@ -28,7 +31,13 @@
             <div class="book-meta">
                 <span><i class="ph ph-user"></i> {{ borrow.author }}</span>
                 <span><i class="ph ph-copy"></i> Copy {{ borrow.copy_number }}</span>
-                <span><i class="ph ph-arrows-clockwise"></i> Renewals left: {{ renewals_left }}/2</span>
+                <span>
+                    <i class="ph ph-arrows-clockwise"></i>
+                    Renewals left:
+                    <strong style="color:{{ 'var(--teal)' if renewals_left > 0 else 'var(--danger)' }};">
+                        {{ renewals_left }}/2
+                    </strong>
+                </span>
             </div>
         </div>
         <div class="book-actions">
@@ -39,9 +48,9 @@
 
             {% if renewals_left > 0 %}
                 <form method="POST" action="{{ url_for('renew_action', record_id=borrow.record_id) }}" style="margin:0;">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-teal">
                         <i class="ph-bold ph-arrows-clockwise"></i>
-                        Renew (+14d)
+                        Renew +14d
                     </button>
                 </form>
             {% else %}
@@ -54,7 +63,9 @@
 
 {% else %}
 <div class="empty-state">
-    <i class="ph-duotone ph-tray"></i>
+    <div class="empty-icon">
+        <i class="ph-duotone ph-tray"></i>
+    </div>
     <h3>Nothing to renew</h3>
     <p>You currently have no active borrows to renew.</p>
 </div>

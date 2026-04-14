@@ -7,7 +7,10 @@
 
 {% block content %}
 <div class="page-header">
-    <h1><i class="ph-bold ph-arrow-u-up-left"></i> Return a Book</h1>
+    <h1>
+        <span class="header-icon"><i class="ph-bold ph-arrow-u-up-left"></i></span>
+        Return a Book
+    </h1>
     <p>Select a book from your active borrows to return it.</p>
 </div>
 
@@ -34,23 +37,29 @@
             {% if borrow.due_status == 'Overdue' %}
                 <div>
                     <div class="badge badge-overdue">
-                        <i class="ph-bold ph-warning"></i> OVERDUE
+                        <i class="ph-bold ph-warning"></i> Overdue
                     </div>
-                    <div class="due-date" style="margin-top:4px; text-align:center; font-size:0.8rem; color:var(--danger);">{{ borrow.due_date.strftime('%d %b %Y') }}</div>
+                    <div class="due-date" style="margin-top:5px; text-align:center; font-size:0.8rem; color:var(--danger);">
+                        {{ borrow.due_date.strftime('%d %b %Y') }}
+                    </div>
                 </div>
             {% elif borrow.due_status == 'Due Soon' %}
                 <div>
                     <div class="badge badge-due-soon">
                         <i class="ph-bold ph-clock"></i> Due Soon
                     </div>
-                    <div class="due-date" style="margin-top:4px; text-align:center; font-size:0.8rem; color:var(--warning);">{{ borrow.due_date.strftime('%d %b %Y') }}</div>
+                    <div class="due-date" style="margin-top:5px; text-align:center; font-size:0.8rem; color:var(--warning);">
+                        {{ borrow.due_date.strftime('%d %b %Y') }}
+                    </div>
                 </div>
             {% else %}
                 <div>
                     <div class="badge badge-on-time">
                         <i class="ph-bold ph-check-circle"></i> On Time
                     </div>
-                    <div class="due-date" style="margin-top:4px; text-align:center; font-size:0.8rem; color:var(--success);">{{ borrow.due_date.strftime('%d %b %Y') }}</div>
+                    <div class="due-date" style="margin-top:5px; text-align:center; font-size:0.8rem; color:var(--success);">
+                        {{ borrow.due_date.strftime('%d %b %Y') }}
+                    </div>
                 </div>
             {% endif %}
 
@@ -67,7 +76,9 @@
 
 {% else %}
 <div class="empty-state">
-    <i class="ph-duotone ph-tray"></i>
+    <div class="empty-icon">
+        <i class="ph-duotone ph-tray"></i>
+    </div>
     <h3>Nothing to return</h3>
     <p>You currently have no active borrows.</p>
 </div>
