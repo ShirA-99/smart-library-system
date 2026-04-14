@@ -27,6 +27,10 @@
             <i class="ph ph-clock-counter-clockwise"></i>
             <span>History</span>
         </a>
+        <a href="{{ url_for('demo_page') }}" class="{{ 'active' if active_tab == 'demo' else '' }}">
+            <i class="ph ph-lightning"></i>
+            <span>Concurrency Demo</span>
+        </a>
     </ul>
 
     <div class="navbar-user">

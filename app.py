@@ -13,6 +13,7 @@ sys.path.append(".")
 from src.borrow      import search_books, get_all_books, borrow_book, get_student_borrows, get_student
 from src.return_book  import return_book, get_borrow_history
 from src.renew        import renew_book
+from src.db           import get_cursor
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "smart-library-secret-key-2024")
@@ -178,6 +179,75 @@ def history():
                            student=student,
                            records=records,
                            active_tab="history")
+
+
+# ================================================
+# Concurrency Demo Routes
+# ================================================
+
+@app.route("/demo")
+def demo_page():
+    """Live Concurrency Simulation Demo Page."""
+    if "student" not in session:
+        return redirect(url_for("login"))
+    
+    student = session["student"]
+    return render_template("demo.html", student=student, active_tab="demo")
+
+@app.route("/api/demo/reset", methods=["POST"])
+def demo_reset():
+    """Reset database to initial state for demo."""
+    conn, cursor = get_cursor()
+    try:
+        conn.autocommit = False
+        cursor.execute("UPDATE borrowing_records SET status = 'returned', returned_at = CURRENT_TIMESTAMP WHERE status = 'active'")
+        cursor.execute("UPDATE book_copies SET status = 'available', version = version + 1, last_updated = CURRENT_TIMESTAMP")
+        conn.commit()
+        return jsonify({"success": True, "message": "Database reset: All copies available."})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/demo/availability/<int:book_id>")
+def demo_availability(book_id):
+    """Get real-time availability of a book."""
+    conn, cursor = get_cursor()
+    try:
+        cursor.execute("""
+            SELECT
+                COUNT(*) FILTER (WHERE status = 'available') AS available,
+                COUNT(*) FILTER (WHERE status = 'borrowed')  AS borrowed,
+                COUNT(*)                                      AS total
+            FROM book_copies
+            WHERE book_id = %s
+        """, (book_id,))
+        return jsonify(dict(cursor.fetchone()))
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/demo/borrow", methods=["POST"])
+def demo_borrow():
+    """Execute a borrow for a specific student and book."""
+    data = request.get_json()
+    book_id = data.get("book_id")
+    student_id = data.get("student_id")
+    
+    if not book_id or not student_id:
+        return jsonify({"success": False, "message": "Missing book_id or student_id"}), 400
+
+    import time
+    start_time = time.time()
+    
+    result = borrow_book(book_id, student_id)
+    
+    elapsed_ms = round((time.time() - start_time) * 1000, 2)
+    result["elapsed_ms"] = elapsed_ms
+    
+    return jsonify(result)
 
 
 # ================================================
