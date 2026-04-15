@@ -34,9 +34,14 @@ body {
     font-family: "Source Sans 3", sans-serif;
     color: var(--ink);
     background:
-        linear-gradient(180deg, rgba(255, 253, 249, 0.8), rgba(245, 240, 230, 0.95)),
+        linear-gradient(180deg, rgba(255, 253, 249, 0.78), rgba(245, 240, 230, 0.86)),
+        url("./illustrations/library-reading-room-bg.png"),
         repeating-linear-gradient(90deg, rgba(154, 76, 47, 0.04) 0, rgba(154, 76, 47, 0.04) 1px, transparent 1px, transparent 140px),
         var(--paper);
+    background-repeat: no-repeat, no-repeat, repeat, repeat;
+    background-position: center top, center top, 0 0, 0 0;
+    background-size: auto, cover, auto, auto;
+    background-attachment: scroll, fixed, scroll, scroll;
     line-height: 1.5;
 }
 
@@ -94,6 +99,14 @@ button, input { font: inherit; }
     stroke-width: 1.7;
     stroke-linecap: round;
     stroke-linejoin: round;
+}
+
+.editorial-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
 }
 
 .flash-container { margin-bottom: 24px; }
@@ -595,6 +608,12 @@ button, input { font: inherit; }
 }
 
 @media (max-width: 720px) {
+    body {
+        background-position: center top, 66% top, 0 0, 0 0;
+        background-size: auto, cover, auto, auto;
+        background-attachment: scroll, scroll, scroll, scroll;
+    }
+
     .page-container,
     .site-footer__inner,
     .app-nav__inner,

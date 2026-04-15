@@ -86,13 +86,15 @@
         }
     }
 
-    async function fetchAvailability() {
+    async function fetchAvailability(updateExpected = true) {
         try {
             const res = await fetch(`/api/demo/availability/${TARGET_BOOK_ID}`);
             const data = await res.json();
             availableCopies = data.available;
             counterDisplay.innerText = `${data.available} Available / ${data.total} Total`;
-            expectedDisplay.innerText = data.available;
+            if (updateExpected) {
+                expectedDisplay.innerText = data.available;
+            }
             btnRace.disabled = data.available === 0;
             if (data.available === 0) {
                 btnRace.style.opacity = '0.5';
@@ -124,6 +126,8 @@
     async function startRace() {
         btnRace.disabled = true;
         btnReset.disabled = true;
+        const expectedSuccesses = availableCopies;
+        expectedDisplay.innerText = expectedSuccesses;
 
         const promises = [];
 
@@ -175,11 +179,11 @@
             }
         });
 
-        await fetchAvailability();
+        await fetchAvailability(false);
         btnReset.disabled = false;
         resetButtonMarkup();
 
-        if (successCount === expectedDisplay.innerText || successCount <= parseInt(expectedDisplay.innerText, 10)) {
+        if (successCount <= expectedSuccesses) {
             const flash = document.createElement('div');
             flash.className = 'flash flash-success';
             flash.innerHTML = `{{ icons.render_icon('success', 'flash__icon') }}<div class="flash__message">Race complete. Database concurrency lock functioned correctly with no duplicate writes.</div>`;
