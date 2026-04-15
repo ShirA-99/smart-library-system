@@ -1,255 +1,212 @@
-# Smart Library Self-Service System
+# Smart Library System
 
-A concurrency-safe university library self-service system built with
-Python, PostgreSQL, and Flask. Designed to handle multiple kiosk
-users simultaneously during peak hours (e.g., exam periods).
+A Flask and PostgreSQL library self-service system for borrowing, returning, renewing, and viewing borrowing history. The project also includes a live concurrency demo that shows how row-level locking prevents duplicate borrows when multiple kiosks compete for the same book copy.
 
----
+## Features
+
+- Student login using seeded test accounts
+- Browse and search the catalog
+- Borrow available book copies
+- Return active borrows
+- Renew active borrows
+- View borrowing history
+- Run a live concurrency demo in the browser
+- Run a threaded load test from the command line
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | HTML, CSS, Jinja2 Templates |
-| Backend | Flask (Python 3.8+) |
+| Backend | Flask 3.1 |
 | Database | PostgreSQL |
-| Icons | Phosphor Icons |
-| Fonts | DM Sans (Google Fonts) |
-| Concurrency Control | PostgreSQL Row-Level Locking (`SELECT FOR UPDATE`) |
-| Version Control | Git + GitHub |
+| Templates | Jinja2 |
+| Python | Python 3.8+ |
+| DB Driver | `psycopg2-binary` |
+| Environment Config | `python-dotenv` |
+| UI | Server-rendered HTML + shared CSS |
 
----
+## Project Structure
+
+```text
+smart-library-system/
+|-- app.py
+|-- requirements.txt
+|-- README.md
+|-- database/
+|   |-- schema.sql
+|   |-- seed_data.sql
+|-- src/
+|   |-- db.py
+|   |-- borrow.py
+|   |-- return_book.py
+|   |-- renew.py
+|-- static/
+|   |-- editorial.css
+|   |-- illustrations/
+|   |   |-- library-reading-room-bg.png
+|   |-- vendor/
+|       |-- streamline/
+|-- templates/
+|   |-- base.html
+|   |-- navbar.html
+|   |-- dashboard.html
+|   |-- returns.html
+|   |-- renew.html
+|   |-- history.html
+|   |-- login_editorial.html
+|   |-- demo_editorial.html
+|   |-- _icons.html
+|-- tests/
+|   |-- load_test.py
+```
 
 ## Prerequisites
 
-Make sure you have the following installed:
+- Python 3.8 or newer
+- PostgreSQL
+- Git
 
-- [Python 3.8+](https://www.python.org/downloads/)
-- [PostgreSQL](https://www.postgresql.org/download/)
-- [Git](https://git-scm.com/)
-- [VS Code](https://code.visualstudio.com/) *(recommended)*
+## Setup
 
----
-
-## Getting Started
-
-### 1. Clone the Repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/ShirA-99/smart-library-system.git
 cd smart-library-system
 ```
 
----
-
-### 2. Create and Activate Virtual Environment
+### 2. Create and activate a virtual environment
 
 ```bash
-# Create virtual environment
 python -m venv venv
 ```
 
-```bash
-# Activate — Windows:
-venv\Scripts\activate
+Windows:
 
-# Activate — Mac/Linux:
+```powershell
+venv\Scripts\activate
+```
+
+macOS / Linux:
+
+```bash
 source venv/bin/activate
 ```
 
-You should see `(venv)` appear at the start of your terminal line.
-
----
-
-### 3. Install Dependencies
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
+### 4. Create the database
 
-### 4. Add psql to PATH (Windows Only)
-
-If `psql` is not recognized, run this in your terminal.
-Replace `16` with your installed PostgreSQL version number:
-
-```powershell
-$env:Path += ";C:\Program Files\PostgreSQL\16\bin"
-```
-
-Verify it works:
-```powershell
-psql --version
-```
-
-> Tip: To make this permanent, add `C:\Program Files\PostgreSQL\16\bin`
-> to your System Environment Variables under **Path**.
-
----
-
-### 5. Set Up the Database
-
-Make sure PostgreSQL is running, then run these commands one by one:
+Create a PostgreSQL database named `library_db`:
 
 ```bash
-# Create the database
 psql -U postgres -c "CREATE DATABASE library_db;"
+```
 
-# Create the tables
+Load the schema:
+
+```bash
 psql -U postgres -d library_db -f database/schema.sql
+```
 
-# Load sample data
+Load the seed data:
+
+```bash
 psql -U postgres -d library_db -f database/seed_data.sql
 ```
 
-It will ask for your PostgreSQL password each time.
+### 5. Configure environment variables
 
-Verify the data loaded correctly:
-```bash
-psql -U postgres -d library_db -c "\dt"
-```
+Create a `.env` file in the project root:
 
-You should see 4 tables: `students`, `books`, `book_copies`, `borrowing_records`.
-
----
-
-### 6. Configure Environment Variables
-
-Create a `.env` file in the **root folder** of the project:
-
-```
+```env
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=library_db
 DB_USER=postgres
 DB_PASSWORD=your_password_here
+FLASK_SECRET_KEY=change-this-in-production
 ```
 
-> Note: Replace `your_password_here` with your actual PostgreSQL password.
-> The `.env` file is already in `.gitignore` — it will NOT be uploaded to GitHub.
-
----
-
-### 7. Run the Application
+### 6. Run the application
 
 ```bash
 python app.py
 ```
 
-Then open your browser and go to:
-```
+Open:
+
+```text
 http://localhost:5000
 ```
 
----
+## Test Accounts
 
-## Simulating Multiple Kiosks
+The seeded login accounts use student numbers:
 
-Each browser tab acts as a **separate kiosk**.
+```text
+STU001 through STU010
+```
 
-To demonstrate concurrency:
-1. Open `http://localhost:5000` in **two or more browser tabs**
-2. Log in as different students in each tab
-3. Try borrowing the **same book** from both tabs at the same time
-4. Only **one tab will succeed** — the other will be blocked
+## Application Pages
 
-This demonstrates the **race condition prevention** built into the system.
+- `/login` - student login page
+- `/dashboard` - browse and search books
+- `/returns` - return active borrows
+- `/renew` - renew active borrows
+- `/history` - view borrowing history
+- `/demo` - run the live concurrency demonstration
 
----
+## Concurrency Demo
 
-## Running the Load Test
+The demo page simulates multiple kiosk users trying to borrow the same book at the same time.
 
-To simulate many kiosks operating at the same time:
+What it shows:
+
+- Current available copies for the target book
+- Parallel borrow requests from multiple seeded students
+- Which requests succeed and which lose the race
+- That successful borrows do not exceed the number of available copies
+
+Relevant demo endpoints:
+
+- `POST /api/demo/reset`
+- `GET /api/demo/availability/<book_id>`
+- `POST /api/demo/borrow`
+
+## Load Test
+
+Run the threaded load test with:
 
 ```bash
 python tests/load_test.py
 ```
 
-This script will:
-- Spawn multiple threads (each thread = one kiosk)
-- Attempt to borrow the same books concurrently
-- Print response times for each transaction
-- Report any conflicts or errors detected
+This script simulates concurrent borrowing attempts and helps validate that the locking logic behaves correctly under contention.
 
----
+## Concurrency Control
 
-## Project Structure
+The project uses PostgreSQL row-level locking during borrowing operations.
 
-```
-smart-library-system/
-|
-|-- README.md                  # This file
-|-- requirements.txt           # Python dependencies
-|-- .env                       # DB credentials (not on GitHub)
-|-- .gitignore                 # Files excluded from GitHub
-|
-|-- app.py                     # Flask app (main entry point)
-|
-|-- templates/
-|   |-- base.html              # Base layout template
-|   |-- navbar.html            # Shared navigation bar
-|   |-- login.html             # Student login page
-|   |-- dashboard.html         # Browse & borrow books
-|   |-- returns.html           # Return borrowed books
-|   |-- renew.html             # Renew borrowed books
-|   |-- history.html           # Borrowing history
-|
-|-- database/
-|   |-- schema.sql             # Table definitions and indexes
-|   |-- seed_data.sql          # Sample books and students
-|
-|-- src/
-|   |-- db.py                  # Database connection manager
-|   |-- borrow.py              # Borrow logic with locking
-|   |-- return_book.py         # Return logic
-|   |-- renew.py               # Renew logic
-|
-|-- tests/
-    |-- load_test.py           # Concurrent kiosk load test
-```
+Primary approach:
 
----
+- `SELECT ... FOR UPDATE` locks a specific book-copy row during a borrow transaction
+- competing transactions must wait or fail safely instead of double-issuing the same copy
 
-## How Concurrency Control Works
+Secondary safeguard:
 
-This system prevents race conditions using two strategies:
+- the schema includes a `version` column for optimistic checks
 
-**1. Pessimistic Locking (`SELECT FOR UPDATE`)**
-- When a student borrows a book, the system locks that book copy's
-  database row immediately
-- Any other kiosk trying to borrow the same copy is forced to wait
-- Once the transaction completes, the lock is released
-- Guarantees no two students can borrow the same copy simultaneously
+## Notes
 
-**2. Optimistic Locking (version numbers)**
-- Each book copy has a `version` column
-- Before updating, the system checks if the version has changed
-- If another kiosk already updated it, the transaction is rejected
-- Used as a secondary safety net
-
----
-
-## Database Tables
-
-| Table | Description |
-|---|---|
-| `students` | Student accounts and details |
-| `books` | Book titles and metadata |
-| `book_copies` | Individual physical copies (locked during borrow) |
-| `borrowing_records` | Active and historical borrow transactions |
-
----
-
-## Authors
-
-| Name | Student ID |
-|---|---|
-| Your Name Here | YOUR_STUDENT_ID |
-| Your Name Here | YOUR_STUDENT_ID |
-
----
+- This project is intended for academic and demonstration use.
+- The current UI is server-rendered and styled through the shared `static/editorial.css` stylesheet.
+- The login and demo pages use the editorial template variants currently wired in `app.py`.
 
 ## License
 
-This project is developed for academic purposes only.
+Academic use project.
