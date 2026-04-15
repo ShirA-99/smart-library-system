@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_icons.html" as icons %}
 {% block title %}Borrowing History — University Library{% endblock %}
 
 {% block navbar %}
@@ -7,69 +8,69 @@
 
 {% block content %}
 <div class="page-header">
-    <h1>
-        <span class="header-icon"><i class="ph-bold ph-clock-counter-clockwise"></i></span>
-        Borrowing History
-    </h1>
-    <p>View all your past and current borrowing records.</p>
+    <div class="page-header__icon editorial-icon">{{ icons.render_icon('history') }}</div>
+    <div>
+        <div class="page-header__eyebrow">Patron Record</div>
+        <h1>Borrowing History</h1>
+        <p>Review your full borrowing timeline, including active items, completed returns, and renewals.</p>
+    </div>
 </div>
 
 {% if records %}
 <div class="result-info">
-    Total records: <strong>{{ records|length }}</strong>
+    <div>Total records: <strong>{{ records|length }}</strong></div>
+    <div class="small-note">Each entry shows the lifecycle of a single copy.</div>
 </div>
 
-<div class="stagger">
-{% for record in records %}
-    <div class="book-card animate-fade-in-up">
-        <div class="book-icon">
-            <i class="ph-duotone ph-book-bookmark"></i>
-        </div>
-        <div class="book-info">
-            <div class="book-title">{{ record.title }}</div>
-            <div class="book-meta">
-                <span><i class="ph ph-user"></i> {{ record.author }}</span>
-                <span><i class="ph ph-copy"></i> Copy {{ record.copy_number }}</span>
-                <span><i class="ph ph-calendar-blank"></i> Borrowed: {{ record.borrowed_at.strftime('%d %b %Y') }}</span>
-                <span><i class="ph ph-arrows-clockwise"></i> Renewed: {{ record.renewed_count }}x</span>
+<section class="content-panel">
+    <div class="catalog-list">
+        {% for record in records %}
+        <article class="catalog-entry">
+            <div class="catalog-entry__body">
+                <div class="catalog-entry__kicker">
+                    {{ icons.render_icon('folder', 'catalog-entry__meta-icon') }}
+                    <span>Borrowing record</span>
+                </div>
+                <h2 class="catalog-entry__title">{{ record.title }}</h2>
+                <div class="catalog-entry__meta">
+                    <span class="catalog-entry__meta-item">{{ icons.render_icon('author', 'catalog-entry__meta-icon') }} {{ record.author }}</span>
+                    <span class="catalog-entry__meta-item">{{ icons.render_icon('copy', 'catalog-entry__meta-icon') }} Copy {{ record.copy_number }}</span>
+                    <span class="catalog-entry__meta-item">{{ icons.render_icon('calendar', 'catalog-entry__meta-icon') }} Borrowed {{ record.borrowed_at.strftime('%d %b %Y') }}</span>
+                    <span class="catalog-entry__meta-item">{{ icons.render_icon('renew', 'catalog-entry__meta-icon') }} Renewed {{ record.renewed_count }}x</span>
+                </div>
             </div>
-        </div>
-        <div class="book-actions">
-            {% if record.status == 'active' %}
-                <div class="badge badge-active">
-                    <i class="ph-bold ph-circle-dashed"></i>
-                    Active
+            <div class="catalog-entry__actions">
+                {% if record.status == 'active' %}
+                <div class="status-badge status-badge--neutral">
+                    {{ icons.render_icon('active', 'status-badge__icon') }}
+                    <span>Active</span>
                 </div>
-            {% elif record.status == 'returned' %}
-                <div style="text-align: right;">
-                    <div class="badge badge-returned">
-                        <i class="ph-bold ph-check-circle"></i>
-                        Returned
-                    </div>
-                    {% if record.returned_at %}
-                    <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 5px;">
-                        on {{ record.returned_at.strftime('%d %b %Y') }}
-                    </div>
-                    {% endif %}
+                {% elif record.status == 'returned' %}
+                <div class="status-badge status-badge--success">
+                    {{ icons.render_icon('returned', 'status-badge__icon') }}
+                    <span>Returned</span>
                 </div>
-            {% else %}
-                <div class="badge badge-overdue">
-                    <i class="ph-bold ph-warning"></i>
-                    Overdue
+                {% if record.returned_at %}
+                <div class="date-note">Returned {{ record.returned_at.strftime('%d %b %Y') }}</div>
+                {% endif %}
+                {% else %}
+                <div class="status-badge status-badge--danger">
+                    {{ icons.render_icon('warning', 'status-badge__icon') }}
+                    <span>Overdue</span>
                 </div>
-            {% endif %}
-        </div>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
     </div>
-{% endfor %}
-</div>
-
+</section>
 {% else %}
-<div class="empty-state">
-    <div class="empty-icon">
-        <i class="ph-duotone ph-folder-open"></i>
+<div class="content-panel">
+    <div class="empty-state">
+        <div class="empty-state__icon editorial-icon">{{ icons.render_icon('folder') }}</div>
+        <h3>No history yet</h3>
+        <p>Your borrowing history will appear here after your first checkout.</p>
     </div>
-    <h3>No history yet</h3>
-    <p>Your borrowing history will appear here once you borrow a book.</p>
 </div>
 {% endif %}
 {% endblock %}

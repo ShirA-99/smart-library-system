@@ -1,46 +1,54 @@
-<!-- Shared navbar for authenticated pages -->
-<nav class="navbar">
-    <a href="{{ url_for('dashboard') }}" class="navbar-brand">
-        <div class="brand-icon">
-            <i class="ph-duotone ph-books"></i>
-        </div>
-        <div class="brand-text">
-            <span class="brand-name">University Library</span>
-            <span class="brand-sub">Self-Service Kiosk</span>
-        </div>
-    </a>
+{% import "_icons.html" as icons %}
+<nav class="app-nav">
+    <div class="app-nav__inner">
+        <a href="{{ url_for('dashboard') }}" class="brand-mark">
+            <div class="brand-mark__seal editorial-icon">
+                {{ icons.render_icon('library') }}
+            </div>
+            <div class="brand-mark__text">
+                <span class="brand-mark__kicker">Reading Room Network</span>
+                <span class="brand-mark__name">University Library</span>
+                <span class="brand-mark__sub">Self-service circulation kiosk</span>
+            </div>
+        </a>
 
-    <ul class="navbar-links">
-        <a href="{{ url_for('dashboard') }}" class="{{ 'active' if active_tab == 'browse' else '' }}">
-            <i class="ph ph-book-open-text"></i>
-            <span>Browse</span>
-        </a>
-        <a href="{{ url_for('returns') }}" class="{{ 'active' if active_tab == 'returns' else '' }}">
-            <i class="ph ph-arrow-u-up-left"></i>
-            <span>Return</span>
-        </a>
-        <a href="{{ url_for('renew_page') }}" class="{{ 'active' if active_tab == 'renew' else '' }}">
-            <i class="ph ph-arrows-clockwise"></i>
-            <span>Renew</span>
-        </a>
-        <a href="{{ url_for('history') }}" class="{{ 'active' if active_tab == 'history' else '' }}">
-            <i class="ph ph-clock-counter-clockwise"></i>
-            <span>History</span>
-        </a>
-        <a href="{{ url_for('demo_page') }}" class="{{ 'active' if active_tab == 'demo' else '' }}">
-            <i class="ph ph-lightning"></i>
-            <span>Concurrency Demo</span>
-        </a>
-    </ul>
-
-    <div class="navbar-user">
-        <div class="user-avatar">
-            <i class="ph-fill ph-user-circle"></i>
+        <div class="app-nav__links">
+            <a href="{{ url_for('dashboard') }}" class="nav-link {% if active_tab == 'browse' %}is-active{% endif %}">
+                {{ icons.render_icon('browse', 'nav-link__icon') }}
+                <span>Browse</span>
+            </a>
+            <a href="{{ url_for('returns') }}" class="nav-link {% if active_tab == 'returns' %}is-active{% endif %}">
+                {{ icons.render_icon('return', 'nav-link__icon') }}
+                <span>Return</span>
+            </a>
+            <a href="{{ url_for('renew_page') }}" class="nav-link {% if active_tab == 'renew' %}is-active{% endif %}">
+                {{ icons.render_icon('renew', 'nav-link__icon') }}
+                <span>Renew</span>
+            </a>
+            <a href="{{ url_for('history') }}" class="nav-link {% if active_tab == 'history' %}is-active{% endif %}">
+                {{ icons.render_icon('history', 'nav-link__icon') }}
+                <span>History</span>
+            </a>
+            <a href="{{ url_for('demo_page') }}" class="nav-link {% if active_tab == 'demo' %}is-active{% endif %}">
+                {{ icons.render_icon('demo', 'nav-link__icon') }}
+                <span>Demo</span>
+            </a>
         </div>
-        <strong>{{ student.full_name }}</strong>
-        <a href="{{ url_for('logout') }}" class="btn-logout">
-            <i class="ph ph-sign-out"></i>
-            Sign Out
-        </a>
+
+        <div class="app-nav__account">
+            <div class="account-chip">
+                <div class="account-chip__avatar editorial-icon">
+                    {{ icons.render_icon('user') }}
+                </div>
+                <div class="account-chip__text">
+                    <span class="account-chip__label">Signed In</span>
+                    <span class="account-chip__name">{{ student.full_name }}</span>
+                </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn btn-subtle">
+                {{ icons.render_icon('logout', 'btn-icon') }}
+                <span>Sign Out</span>
+            </a>
+        </div>
     </div>
 </nav>

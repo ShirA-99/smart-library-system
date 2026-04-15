@@ -1,9 +1,3 @@
-# ================================================
-# app.py
-# Smart Library Self-Service System
-# Flask Web Application
-# ================================================
-
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 import sys
 import os
@@ -48,7 +42,7 @@ def login():
             flash("Student not found. Please check your student number.", "error")
             return redirect(url_for("login"))
 
-    return render_template("login.html")
+    return render_template("login_editorial.html")
 
 
 @app.route("/logout")
@@ -192,7 +186,7 @@ def demo_page():
         return redirect(url_for("login"))
     
     student = session["student"]
-    return render_template("demo.html", student=student, active_tab="demo")
+    return render_template("demo_editorial.html", student=student, active_tab="demo")
 
 @app.route("/api/demo/reset", methods=["POST"])
 def demo_reset():

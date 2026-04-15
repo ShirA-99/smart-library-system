@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Concurrency Demo - University Library{% endblock %}
+
+{% block navbar %}
+{% include "navbar.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header__icon editorial-icon">{{ icons.render_icon('demo') }}</div>
+    <div>
+        <div class="page-header__eyebrow">Systems Demonstration</div>
+        <h1>Live Concurrency Race Demo</h1>
+        <p>Simulate multiple kiosks trying to borrow the same book at once and watch the locking strategy keep records safe.</p>
+    </div>
+</div>
+
+<section class="demo-hero">
+    <div class="demo-hero__top">
+        <div>
+            <div class="catalog-label">{{ icons.render_icon('stamp', 'catalog-entry__meta-icon') }} Demonstration target</div>
+            <h2 class="demo-hero__title">Book ID 1: Clean Code</h2>
+            <div class="small-note">Current status: <strong id="availability-counter">Loading...</strong></div>
+            <div class="small-note">Expected behavior: only <span id="expected-successes">N</span> request(s) should succeed, with no duplicate writes.</div>
+        </div>
+        <div class="button-row">
+            <button id="btn-reset" class="btn btn-secondary">
+                {{ icons.render_icon('reset', 'btn-icon') }}
+                <span>Reset environment</span>
+            </button>
+            <button id="btn-race" class="btn btn-primary">
+                {{ icons.render_icon('launch', 'btn-icon') }}
+                <span>Launch simultaneous borrow</span>
+            </button>
+        </div>
+    </div>
+</section>
+
+<div id="kiosks-grid" class="demo-grid"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const KIOSK_COUNT = 10;
+    const TARGET_BOOK_ID = 1;
+    const STUDENTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    let availableCopies = 0;
+
+    const grid = document.getElementById('kiosks-grid');
+    const btnRace = document.getElementById('btn-race');
+    const btnReset = document.getElementById('btn-reset');
+    const counterDisplay = document.getElementById('availability-counter');
+    const expectedDisplay = document.getElementById('expected-successes');
+
+    function resetButtonMarkup() {
+        btnReset.innerHTML = `{{ icons.render_icon('reset', 'btn-icon') }}<span>Reset environment</span>`;
+    }
+
+    function launchButtonMarkup() {
+        btnRace.innerHTML = `{{ icons.render_icon('launch', 'btn-icon') }}<span>Launch simultaneous borrow</span>`;
+    }
+
+    function initKiosks() {
+        grid.innerHTML = '';
+        for (let i = 0; i < KIOSK_COUNT; i++) {
+            const studentNum = `STU${(i + 1).toString().padStart(3, '0')}`;
+            const kiosk = document.createElement('div');
+            kiosk.className = 'demo-grid__item';
+            kiosk.id = `kiosk-${i}`;
+            kiosk.innerHTML = `
+                <div class="demo-grid__head">
+                    <div>
+                        <div class="demo-grid__label">Kiosk</div>
+                        <div class="demo-grid__title">Kiosk ${i + 1}</div>
+                    </div>
+                    <span class="demo-grid__label">User ${studentNum}</span>
+                </div>
+                <div id="status-${i}" class="demo-grid__status">
+                    <div>Status: <strong>Waiting...</strong></div>
+                </div>
+                <div id="loader-${i}" class="demo-grid__loader"></div>
+            `;
+            grid.appendChild(kiosk);
+        }
+    }
+
+    async function fetchAvailability() {
+        try {
+            const res = await fetch(`/api/demo/availability/${TARGET_BOOK_ID}`);
+            const data = await res.json();
+            availableCopies = data.available;
+            counterDisplay.innerText = `${data.available} Available / ${data.total} Total`;
+            expectedDisplay.innerText = data.available;
+            btnRace.disabled = data.available === 0;
+            if (data.available === 0) {
+                btnRace.style.opacity = '0.5';
+                btnRace.innerHTML = '<span>No copies left</span>';
+            } else {
+                btnRace.style.opacity = '1';
+                launchButtonMarkup();
+            }
+        } catch (e) {
+            console.error('Failed to fetch availability', e);
+        }
+    }
+
+    async function resetDB() {
+        btnReset.disabled = true;
+        btnReset.innerHTML = `{{ icons.render_icon('reset', 'btn-icon') }}<span>Resetting...</span>`;
+        try {
+            await fetch('/api/demo/reset', { method: 'POST' });
+            initKiosks();
+            await fetchAvailability();
+        } catch (e) {
+            console.error('Reset failed', e);
+        } finally {
+            btnReset.disabled = false;
+            resetButtonMarkup();
+        }
+    }
+
+    async function startRace() {
+        btnRace.disabled = true;
+        btnReset.disabled = true;
+
+        const promises = [];
+
+        for (let i = 0; i < KIOSK_COUNT; i++) {
+            document.getElementById(`loader-${i}`).style.display = 'block';
+            document.getElementById(`status-${i}`).innerHTML = '<div>Status: <strong>Executing POST...</strong></div>';
+            document.getElementById(`kiosk-${i}`).style.borderColor = 'var(--line-strong)';
+        }
+
+        for (let i = 0; i < KIOSK_COUNT; i++) {
+            const p = fetch('/api/demo/borrow', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ book_id: TARGET_BOOK_ID, student_id: STUDENTS[i] })
+            })
+            .then(res => res.json())
+            .then(data => ({ index: i, data }))
+            .catch(() => ({ index: i, data: { success: false, message: 'Network error', elapsed_ms: 0 } }));
+
+            promises.push(p);
+        }
+
+        const raceResults = await Promise.all(promises);
+        let successCount = 0;
+
+        raceResults.forEach(r => {
+            const idx = r.index;
+            const data = r.data;
+            document.getElementById(`loader-${idx}`).style.display = 'none';
+
+            const kioskEl = document.getElementById(`kiosk-${idx}`);
+            const statusEl = document.getElementById(`status-${idx}`);
+
+            if (data.success) {
+                successCount++;
+                kioskEl.style.borderColor = 'var(--success)';
+                statusEl.innerHTML = `
+                    <div>Status: <strong class="status-win">Won race</strong></div>
+                    <div>${data.message}</div>
+                    <div class="small-note">${data.elapsed_ms} ms</div>
+                `;
+            } else {
+                kioskEl.style.borderColor = 'var(--danger)';
+                statusEl.innerHTML = `
+                    <div>Status: <strong class="status-loss">Lost race</strong></div>
+                    <div>${data.message}</div>
+                    <div class="small-note">${data.elapsed_ms} ms</div>
+                `;
+            }
+        });
+
+        await fetchAvailability();
+        btnReset.disabled = false;
+        resetButtonMarkup();
+
+        if (successCount === expectedDisplay.innerText || successCount <= parseInt(expectedDisplay.innerText, 10)) {
+            const flash = document.createElement('div');
+            flash.className = 'flash flash-success';
+            flash.innerHTML = `{{ icons.render_icon('success', 'flash__icon') }}<div class="flash__message">Race complete. Database concurrency lock functioned correctly with no duplicate writes.</div>`;
+            document.querySelector('.page-container').insertBefore(flash, document.querySelector('.page-container').firstChild);
+            setTimeout(() => flash.remove(), 5000);
+        }
+    }
+
+    btnReset.addEventListener('click', resetDB);
+    btnRace.addEventListener('click', startRace);
+
+    initKiosks();
+    fetchAvailability();
+</script>
+{% endblock %}

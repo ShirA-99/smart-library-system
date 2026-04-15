@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_icons.html" as icons %}
 {% block title %}Renew Books — University Library{% endblock %}
 
 {% block navbar %}
@@ -7,67 +8,64 @@
 
 {% block content %}
 <div class="page-header">
-    <h1>
-        <span class="header-icon"><i class="ph-bold ph-arrows-clockwise"></i></span>
-        Renew a Book
-    </h1>
-    <p>Extend your borrow period by 14 days. Maximum 2 renewals per book.</p>
+    <div class="page-header__icon editorial-icon">{{ icons.render_icon('renew') }}</div>
+    <div>
+        <div class="page-header__eyebrow">Renewal Desk</div>
+        <h1>Renew a Book</h1>
+        <p>Extend a borrowing period by 14 days. Each item can be renewed up to two times.</p>
+    </div>
 </div>
 
 {% if borrows %}
 <div class="result-info">
-    You have <strong>{{ borrows|length }}</strong> active borrow(s)
+    <div>You have <strong>{{ borrows|length }}</strong> active borrowing record(s).</div>
+    <div class="small-note">Renewal allowance is tracked per copy.</div>
 </div>
 
-<div class="stagger">
-{% for borrow in borrows %}
-    {% set renewals_left = 2 - borrow.renewed_count|int %}
-    <div class="book-card animate-fade-in-up">
-        <div class="book-icon">
-            <i class="ph-duotone ph-book-bookmark"></i>
-        </div>
-        <div class="book-info">
-            <div class="book-title">{{ borrow.title }}</div>
-            <div class="book-meta">
-                <span><i class="ph ph-user"></i> {{ borrow.author }}</span>
-                <span><i class="ph ph-copy"></i> Copy {{ borrow.copy_number }}</span>
-                <span>
-                    <i class="ph ph-arrows-clockwise"></i>
-                    Renewals left:
-                    <strong style="color:{{ 'var(--teal)' if renewals_left > 0 else 'var(--danger)' }};">
-                        {{ renewals_left }}/2
-                    </strong>
-                </span>
+<section class="content-panel">
+    <div class="catalog-list">
+        {% for borrow in borrows %}
+        {% set renewals_left = 2 - borrow.renewed_count|int %}
+        <article class="catalog-entry">
+            <div class="catalog-entry__body">
+                <div class="catalog-entry__kicker">
+                    {{ icons.render_icon('renew', 'catalog-entry__meta-icon') }}
+                    <span>Renewal record</span>
+                </div>
+                <h2 class="catalog-entry__title">{{ borrow.title }}</h2>
+                <div class="catalog-entry__meta">
+                    <span class="catalog-entry__meta-item">{{ icons.render_icon('author', 'catalog-entry__meta-icon') }} {{ borrow.author }}</span>
+                    <span class="catalog-entry__meta-item">{{ icons.render_icon('copy', 'catalog-entry__meta-icon') }} Copy {{ borrow.copy_number }}</span>
+                    <span class="catalog-entry__meta-item">{{ icons.render_icon('renew', 'catalog-entry__meta-icon') }} {{ renewals_left }}/2 renewals left</span>
+                </div>
             </div>
-        </div>
-        <div class="book-actions">
-            <div class="due-info">
-                <div class="due-label">Due Date</div>
-                <div class="due-date">{{ borrow.due_date.strftime('%d %b %Y') }}</div>
-            </div>
-
-            {% if renewals_left > 0 %}
-                <form method="POST" action="{{ url_for('renew_action', record_id=borrow.record_id) }}" style="margin:0;">
-                    <button type="submit" class="btn btn-teal">
-                        <i class="ph-bold ph-arrows-clockwise"></i>
-                        Renew +14d
+            <div class="catalog-entry__actions">
+                <div class="date-note">Due {{ borrow.due_date.strftime('%d %b %Y') }}</div>
+                {% if renewals_left > 0 %}
+                <form method="POST" action="{{ url_for('renew_action', record_id=borrow.record_id) }}">
+                    <button type="submit" class="btn btn-primary">
+                        {{ icons.render_icon('renew', 'btn-icon') }}
+                        <span>Renew +14 days</span>
                     </button>
                 </form>
-            {% else %}
-                <button class="btn btn-disabled" disabled>Max Renewals</button>
-            {% endif %}
-        </div>
+                {% else %}
+                <div class="status-badge status-badge--danger">
+                    {{ icons.render_icon('error', 'status-badge__icon') }}
+                    <span>Max renewals reached</span>
+                </div>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
     </div>
-{% endfor %}
-</div>
-
+</section>
 {% else %}
-<div class="empty-state">
-    <div class="empty-icon">
-        <i class="ph-duotone ph-tray"></i>
+<div class="content-panel">
+    <div class="empty-state">
+        <div class="empty-state__icon editorial-icon">{{ icons.render_icon('tray') }}</div>
+        <h3>Nothing to renew</h3>
+        <p>You do not have any active borrows eligible for renewal.</p>
     </div>
-    <h3>Nothing to renew</h3>
-    <p>You currently have no active borrows to renew.</p>
 </div>
 {% endif %}
 {% endblock %}

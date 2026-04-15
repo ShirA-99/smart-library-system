@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_icons.html" as icons %}
 {% block title %}Browse Books — University Library{% endblock %}
 
 {% block navbar %}
@@ -7,77 +8,87 @@
 
 {% block content %}
 <div class="page-header">
-    <h1>
-        <span class="header-icon"><i class="ph-bold ph-book-open-text"></i></span>
-        Browse &amp; Borrow
-    </h1>
-    <p>Search the catalog and borrow books directly from any kiosk.</p>
+    <div class="page-header__icon editorial-icon">{{ icons.render_icon('browse') }}</div>
+    <div>
+        <div class="page-header__eyebrow">Circulation Catalog</div>
+        <h1>Browse &amp; Borrow</h1>
+        <p>Search the catalog and borrow books directly from any kiosk. The layout now reads like a catalog record rather than a generic dashboard.</p>
+    </div>
 </div>
 
-<!-- Search -->
-<form method="GET" action="{{ url_for('dashboard') }}" class="search-bar">
-    <i class="ph ph-magnifying-glass"></i>
-    <input type="text" name="q" value="{{ search_query }}" placeholder="Search by title, author, or category...">
-    <button type="submit">
-        <i class="ph-bold ph-magnifying-glass" style="font-size:15px; margin-right:4px;"></i>
-        Search
-    </button>
-</form>
+<section class="search-panel">
+    <form method="GET" action="{{ url_for('dashboard') }}" class="search-form">
+        <div>
+            <label class="field-label" for="search-query">Search the catalog</label>
+            <div class="search-field">
+                {{ icons.render_icon('search', 'search-field__icon') }}
+                <input id="search-query" type="text" name="q" value="{{ search_query }}" placeholder="Title, author, category, or ISBN">
+            </div>
+        </div>
+        <div class="button-row">
+            <button type="submit" class="btn btn-primary">
+                {{ icons.render_icon('search', 'btn-icon') }}
+                <span>Search</span>
+            </button>
+        </div>
+    </form>
+</section>
 
 {% if books %}
 <div class="result-info">
-    Showing <strong>{{ books|length }}</strong> book(s)
-    {% if search_query %} for "<strong>{{ search_query }}</strong>"{% endif %}
+    <div>Showing <strong>{{ books|length }}</strong> catalog record(s){% if search_query %} for "<strong>{{ search_query }}</strong>"{% endif %}</div>
+    <div class="small-note">Availability updates live from the circulation database.</div>
 </div>
 
-<div class="stagger">
-{% for book in books %}
-    <div class="book-card animate-fade-in-up">
-        <div class="book-icon">
-            <i class="ph-duotone ph-book-bookmark"></i>
-        </div>
-        <div class="book-info">
-            <div class="book-title">{{ book.title }}</div>
-            <div class="book-meta">
-                <span><i class="ph ph-user"></i> {{ book.author }}</span>
-                <span><i class="ph ph-tag"></i> {{ book.category }}</span>
-                <span><i class="ph ph-barcode"></i> {{ book.isbn }}</span>
-            </div>
-        </div>
-        <div class="book-actions">
-            {% set available = book.available_copies|int %}
-            {% set total = book.total_copies|int %}
-
-            {% if available > 0 %}
-                <div class="badge badge-available">
-                    <i class="ph-bold ph-check-circle"></i>
-                    {{ available }}/{{ total }} Available
+<section class="content-panel">
+    <div class="catalog-list">
+        {% for book in books %}
+        {% set available = book.available_copies|int %}
+        {% set total = book.total_copies|int %}
+        <article class="catalog-entry">
+            <div class="catalog-entry__body">
+                <div class="catalog-entry__kicker">
+                    {{ icons.render_icon('stamp', 'catalog-entry__meta-icon') }}
+                    <span>Catalog record</span>
                 </div>
-                <form method="POST" action="{{ url_for('borrow', book_id=book.book_id) }}" style="margin:0;">
-                    <button type="submit" class="btn btn-teal">
-                        <i class="ph-bold ph-arrow-circle-down"></i>
-                        Borrow
+                <h2 class="catalog-entry__title">{{ book.title }}</h2>
+                <div class="catalog-entry__meta">
+                    <span class="catalog-entry__meta-item">{{ icons.render_icon('author', 'catalog-entry__meta-icon') }} {{ book.author }}</span>
+                    <span class="catalog-entry__meta-item">{{ icons.render_icon('category', 'catalog-entry__meta-icon') }} {{ book.category }}</span>
+                    <span class="catalog-entry__meta-item">{{ icons.render_icon('isbn', 'catalog-entry__meta-icon') }} {{ book.isbn }}</span>
+                </div>
+            </div>
+            <div class="catalog-entry__actions">
+                {% if available > 0 %}
+                <div class="status-badge status-badge--success">
+                    {{ icons.render_icon('success', 'status-badge__icon') }}
+                    <span>{{ available }}/{{ total }} available</span>
+                </div>
+                <form method="POST" action="{{ url_for('borrow', book_id=book.book_id) }}">
+                    <button type="submit" class="btn btn-primary">
+                        {{ icons.render_icon('browse', 'btn-icon') }}
+                        <span>Borrow copy</span>
                     </button>
                 </form>
-            {% else %}
-                <div class="badge badge-unavailable">
-                    <i class="ph-bold ph-x-circle"></i>
-                    0/{{ total }} Available
+                {% else %}
+                <div class="status-badge status-badge--danger">
+                    {{ icons.render_icon('error', 'status-badge__icon') }}
+                    <span>0/{{ total }} available</span>
                 </div>
-                <button class="btn btn-disabled" disabled>Not Available</button>
-            {% endif %}
-        </div>
+                <button type="button" class="btn" disabled>Not available</button>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
     </div>
-{% endfor %}
-</div>
-
+</section>
 {% else %}
-<div class="empty-state">
-    <div class="empty-icon">
-        <i class="ph-duotone ph-magnifying-glass"></i>
+<div class="content-panel">
+    <div class="empty-state">
+        <div class="empty-state__icon editorial-icon">{{ icons.render_icon('search') }}</div>
+        <h3>No books found</h3>
+        <p>Try a broader keyword or return to the full catalog listing.</p>
     </div>
-    <h3>No books found</h3>
-    <p>Try adjusting your search query or browse the full catalog.</p>
 </div>
 {% endif %}
 {% endblock %}

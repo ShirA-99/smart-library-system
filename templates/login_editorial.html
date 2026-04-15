@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% import "_icons.html" as icons %}
+{% block title %}Sign In - University Library{% endblock %}
+
+{% block content %}
+<div class="login-page">
+    <section class="login-shell login-shell--story">
+        <div>
+            <p class="login-shell__eyebrow">University Reading Room</p>
+            <h1 class="login-shell__title">Circulation kiosk for the quiet end of campus.</h1>
+            <p class="login-shell__copy">The interface now feels closer to a printed catalog and front-desk register than a generated dashboard: quieter surfaces, calmer spacing, and a stronger institutional voice.</p>
+
+            <div class="login-stack">
+                <div class="login-note">
+                    <span class="login-note__label">Access Type</span>
+                    <span class="login-note__value">Student sign-in</span>
+                </div>
+                <div class="login-note">
+                    <span class="login-note__label">Station</span>
+                    <span class="login-note__value">Self-service kiosk</span>
+                </div>
+                <div class="login-note">
+                    <span class="login-note__label">Borrowing</span>
+                    <span class="login-note__value">Live inventory</span>
+                </div>
+            </div>
+        </div>
+
+        <ul class="login-list">
+            <li>{{ icons.render_icon('library', 'login-list__icon') }} Browse the catalog, borrow available copies, and review your borrowing history.</li>
+            <li>{{ icons.render_icon('renew', 'login-list__icon') }} Renew active loans and return copies from the same circulation interface.</li>
+            <li>{{ icons.render_icon('demo', 'login-list__icon') }} Run the concurrency demo to show the database lock behavior in action.</li>
+        </ul>
+    </section>
+
+    <section class="login-shell login-shell--form">
+        <form method="POST" action="{{ url_for('login') }}" class="login-form">
+            <div>
+                <div class="catalog-label">{{ icons.render_icon('stamp', 'catalog-entry__meta-icon') }} Patron access</div>
+                <h2 class="login-form__title">Sign in to the library</h2>
+                <p class="login-form__copy">Use your student number to open the kiosk session.</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">
+                {% if category == 'success' %}
+                {{ icons.render_icon('success', 'flash__icon') }}
+                {% else %}
+                {{ icons.render_icon('warning', 'flash__icon') }}
+                {% endif %}
+                <div class="flash__message">{{ message }}</div>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <div>
+                <label class="field-label" for="student-number">Student number</label>
+                <div class="text-input">
+                    {{ icons.render_icon('user', 'text-input__icon') }}
+                    <input id="student-number" type="text" name="student_number" placeholder="e.g. STU001" maxlength="20" required autofocus>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                {{ icons.render_icon('library', 'btn-icon') }}
+                <span>Enter kiosk</span>
+            </button>
+
+            <div class="small-note">Test accounts: STU001 through STU010</div>
+        </form>
+    </section>
+</div>
+{% endblock %}

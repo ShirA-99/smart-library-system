@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_icons.html" as icons %}
 {% block title %}Return Books — University Library{% endblock %}
 
 {% block navbar %}
@@ -7,80 +8,72 @@
 
 {% block content %}
 <div class="page-header">
-    <h1>
-        <span class="header-icon"><i class="ph-bold ph-arrow-u-up-left"></i></span>
-        Return a Book
-    </h1>
-    <p>Select a book from your active borrows to return it.</p>
+    <div class="page-header__icon editorial-icon">{{ icons.render_icon('return') }}</div>
+    <div>
+        <div class="page-header__eyebrow">Return Desk</div>
+        <h1>Return a Book</h1>
+        <p>Select an active borrowing record and return that copy to the shelf.</p>
+    </div>
 </div>
 
 {% if borrows %}
 <div class="result-info">
-    You have <strong>{{ borrows|length }}</strong> active borrow(s)
+    <div>You have <strong>{{ borrows|length }}</strong> active borrowing record(s).</div>
+    <div class="small-note">Due dates are shown beside each record for quick review.</div>
 </div>
 
-<div class="stagger">
-{% for borrow in borrows %}
-    <div class="book-card animate-fade-in-up">
-        <div class="book-icon">
-            <i class="ph-duotone ph-book-bookmark"></i>
-        </div>
-        <div class="book-info">
-            <div class="book-title">{{ borrow.title }}</div>
-            <div class="book-meta">
-                <span><i class="ph ph-user"></i> {{ borrow.author }}</span>
-                <span><i class="ph ph-copy"></i> Copy {{ borrow.copy_number }}</span>
-                <span><i class="ph ph-calendar-blank"></i> Borrowed: {{ borrow.borrowed_at.strftime('%d %b %Y') }}</span>
+<section class="content-panel">
+    <div class="catalog-list">
+        {% for borrow in borrows %}
+        <article class="catalog-entry">
+            <div class="catalog-entry__body">
+                <div class="catalog-entry__kicker">
+                    {{ icons.render_icon('tray', 'catalog-entry__meta-icon') }}
+                    <span>Active circulation item</span>
+                </div>
+                <h2 class="catalog-entry__title">{{ borrow.title }}</h2>
+                <div class="catalog-entry__meta">
+                    <span class="catalog-entry__meta-item">{{ icons.render_icon('author', 'catalog-entry__meta-icon') }} {{ borrow.author }}</span>
+                    <span class="catalog-entry__meta-item">{{ icons.render_icon('copy', 'catalog-entry__meta-icon') }} Copy {{ borrow.copy_number }}</span>
+                    <span class="catalog-entry__meta-item">{{ icons.render_icon('calendar', 'catalog-entry__meta-icon') }} Borrowed {{ borrow.borrowed_at.strftime('%d %b %Y') }}</span>
+                </div>
             </div>
-        </div>
-        <div class="book-actions">
-            {% if borrow.due_status == 'Overdue' %}
-                <div>
-                    <div class="badge badge-overdue">
-                        <i class="ph-bold ph-warning"></i> Overdue
-                    </div>
-                    <div class="due-date" style="margin-top:5px; text-align:center; font-size:0.8rem; color:var(--danger);">
-                        {{ borrow.due_date.strftime('%d %b %Y') }}
-                    </div>
+            <div class="catalog-entry__actions">
+                {% if borrow.due_status == 'Overdue' %}
+                <div class="status-badge status-badge--danger">
+                    {{ icons.render_icon('warning', 'status-badge__icon') }}
+                    <span>Overdue</span>
                 </div>
-            {% elif borrow.due_status == 'Due Soon' %}
-                <div>
-                    <div class="badge badge-due-soon">
-                        <i class="ph-bold ph-clock"></i> Due Soon
-                    </div>
-                    <div class="due-date" style="margin-top:5px; text-align:center; font-size:0.8rem; color:var(--warning);">
-                        {{ borrow.due_date.strftime('%d %b %Y') }}
-                    </div>
+                {% elif borrow.due_status == 'Due Soon' %}
+                <div class="status-badge status-badge--warning">
+                    {{ icons.render_icon('clock', 'status-badge__icon') }}
+                    <span>Due soon</span>
                 </div>
-            {% else %}
-                <div>
-                    <div class="badge badge-on-time">
-                        <i class="ph-bold ph-check-circle"></i> On Time
-                    </div>
-                    <div class="due-date" style="margin-top:5px; text-align:center; font-size:0.8rem; color:var(--success);">
-                        {{ borrow.due_date.strftime('%d %b %Y') }}
-                    </div>
+                {% else %}
+                <div class="status-badge status-badge--success">
+                    {{ icons.render_icon('success', 'status-badge__icon') }}
+                    <span>On time</span>
                 </div>
-            {% endif %}
-
-            <form method="POST" action="{{ url_for('return_action', record_id=borrow.record_id) }}" style="margin:0;">
-                <button type="submit" class="btn btn-primary">
-                    <i class="ph-bold ph-arrow-u-up-left"></i>
-                    Return
-                </button>
-            </form>
-        </div>
+                {% endif %}
+                <div class="date-note">Due {{ borrow.due_date.strftime('%d %b %Y') }}</div>
+                <form method="POST" action="{{ url_for('return_action', record_id=borrow.record_id) }}">
+                    <button type="submit" class="btn btn-primary">
+                        {{ icons.render_icon('return', 'btn-icon') }}
+                        <span>Return copy</span>
+                    </button>
+                </form>
+            </div>
+        </article>
+        {% endfor %}
     </div>
-{% endfor %}
-</div>
-
+</section>
 {% else %}
-<div class="empty-state">
-    <div class="empty-icon">
-        <i class="ph-duotone ph-tray"></i>
+<div class="content-panel">
+    <div class="empty-state">
+        <div class="empty-state__icon editorial-icon">{{ icons.render_icon('tray') }}</div>
+        <h3>Nothing to return</h3>
+        <p>You do not have any active borrows right now.</p>
     </div>
-    <h3>Nothing to return</h3>
-    <p>You currently have no active borrows.</p>
 </div>
 {% endif %}
 {% endblock %}
